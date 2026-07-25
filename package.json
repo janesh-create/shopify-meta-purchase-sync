@@ -1,0 +1,18 @@
+{
+  "name": "shopify-meta-purchase-sync",
+  "version": "1.0.0",
+  "description": "Sends server-side Purchase events to Meta Conversions API when a Shopify order is created, recovering ad-click identifiers (fbclid/fbp/fbc) that were stored on the order by a 3rd-party checkout tool.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5"
+  },
+  "license": "UNLICENSED"
+}
