@@ -9,7 +9,7 @@ function sha256(value) {
 }
 
 function buildPurchasePayload(order, adClickData, env) {
-  const { fbclid, fbp, fbc } = adClickData;
+  const { fbclid, fbp, fbc, ip, userAgent } = adClickData;
 
   const customer = order.customer || {};
   const email = order.email || customer.email;
@@ -19,8 +19,12 @@ function buildPurchasePayload(order, adClickData, env) {
   const userData = {
     em: email ? [sha256(email)] : undefined,
     ph: phone ? [sha256(phone)] : undefined,
-    client_ip_address: order.client_details?.browser_ip,
-    client_user_agent: order.client_details?.user_agent,
+    // Prefer values the checkout tool captured directly from the
+    // customer's browser (stored on the order) over Shopify's own
+    // client_details, which for 3rd-party checkouts often reflects
+    // the checkout tool's server rather than the actual shopper.
+    client_ip_address: ip || order.client_details?.browser_ip,
+    client_user_agent: userAgent || order.client_details?.user_agent,
     fbc,
     fbp,
   };

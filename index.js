@@ -28,6 +28,9 @@ const env = {
     fbc: (process.env.ATTR_KEY_FBC || "fbc").toLowerCase(),
     utmSource: (process.env.ATTR_KEY_UTM_SOURCE || "utm_source").toLowerCase(),
     utmContent: (process.env.ATTR_KEY_UTM_CONTENT || "utm_content").toLowerCase(),
+    landingPageUrl: (process.env.ATTR_KEY_LANDING_PAGE_URL || "landing_page_url").toLowerCase(),
+    ip: (process.env.ATTR_KEY_IP || "ipv4_address").toLowerCase(),
+    userAgent: (process.env.ATTR_KEY_USER_AGENT || "user_agent").toLowerCase(),
   },
   trafficFilter: {
     // Comma-separated list, e.g. "facebook,instagram,meta". Matched

@@ -27,20 +27,43 @@ function buildFbc(rawFbc, fbclid, orderCreatedAt) {
 }
 
 /**
+ * Some checkout tools don't store fbclid as its own attribute — instead
+ * it's buried inside the full landing page URL that was captured at
+ * click time (e.g. "...?utm_source=...&fbclid=PAd..."). This pulls it
+ * out if a direct fbclid attribute wasn't found.
+ */
+function extractFbclidFromUrl(landingPageUrl) {
+  if (!landingPageUrl) return undefined;
+  try {
+    const url = new URL(landingPageUrl);
+    return url.searchParams.get("fbclid") || undefined;
+  } catch (err) {
+    // landing_page_url wasn't a valid absolute URL — try a raw regex fallback.
+    const match = landingPageUrl.match(/[?&]fbclid=([^&]+)/);
+    return match ? decodeURIComponent(match[1]) : undefined;
+  }
+}
+
+/**
  * Pulls fbclid/fbp/fbc/utm values off an order using the configurable
  * attribute key names (so this works no matter what your checkout tool
- * happens to name them).
+ * happens to name them). Also recovers ip/user_agent from note_attributes
+ * when the checkout tool stores them there, since that's often more
+ * accurate than Shopify's own order.client_details for 3rd-party checkouts.
  */
 function extractAdClickData(order, keyConfig) {
   const attrs = attrsToMap(order.note_attributes);
 
-  const fbclid = attrs[keyConfig.fbclid];
+  const landingPageUrl = attrs[keyConfig.landingPageUrl];
+  const fbclid = attrs[keyConfig.fbclid] || extractFbclidFromUrl(landingPageUrl);
   const fbp = attrs[keyConfig.fbp];
   const fbc = buildFbc(attrs[keyConfig.fbc], fbclid, order.created_at);
   const utmSource = attrs[keyConfig.utmSource];
   const utmContent = attrs[keyConfig.utmContent];
+  const ip = attrs[keyConfig.ip];
+  const userAgent = attrs[keyConfig.userAgent];
 
-  return { fbclid, fbp, fbc, utmSource, utmContent };
+  return { fbclid, fbp, fbc, utmSource, utmContent, ip, userAgent };
 }
 
 /**
